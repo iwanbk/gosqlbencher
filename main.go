@@ -7,6 +7,9 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
+
+	"github.com/iwanbk/gosqlbencher/executor"
+	"github.com/iwanbk/gosqlbencher/query"
 )
 
 var (
@@ -14,6 +17,7 @@ var (
 	cfg     = config{
 		NumWorker:      30,
 		DataSourceName: "postgres://127.0.0.1:5432/example?sslmode=disable",
+		NumQuery:       10000,
 	}
 )
 
@@ -24,42 +28,44 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	query := query{
+	query := query.Query{
 		Type:     "exec",
 		QueryStr: "insert into pgbench_accounts (aid,bid, abalance, filler)values($1, $2, $3,$4)",
-		Params: []queryParam{
-			queryParam{
+		Params: []query.Param{
+			query.Param{
 				DataType: integerDataType,
 			},
-			queryParam{
+			query.Param{
 				DataType: integerDataType,
 			},
-			queryParam{
+			query.Param{
 				DataType: integerDataType,
 			},
-			queryParam{
+			query.Param{
 				DataType: stringDataType,
 				Prefix:   "name_",
 			},
 		},
+		Prepare:       true,
+		PrepareOnInit: true,
 	}
 
 	wp := &workProducer{}
-	argsCh := wp.run(ctx, 100, query.Params)
+
+	runner, err := executor.New(db, query)
+	if err != nil {
+		log.Fatalf("failed to create executor: %v", err)
+	}
+
+	argsCh := wp.run(ctx, cfg.NumQuery, query.Params)
 
 	// insert to table
 	func() {
 		log.Println("Insert data")
 		start := time.Now()
 
-		q := "insert into pgbench_accounts (aid,bid, abalance, filler)values($1, $2, $3,$4)"
-		stmt, err := db.PrepareContext(ctx, q)
-		if err != nil {
-			log.Fatalf("prepare failed: %v", err)
-		}
-
 		for args := range argsCh {
-			_, err = stmt.ExecContext(ctx, args...)
+			err = runner.Execute(ctx, args...)
 			if err != nil {
 				log.Fatalf("error insert: %v", err)
 			}

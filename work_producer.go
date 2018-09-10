@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+
+	"github.com/iwanbk/gosqlbencher/query"
 )
 
 type workProducer struct {
@@ -17,7 +19,7 @@ const (
 	sequentialGenType = "sequential"
 )
 
-func (wp *workProducer) run(ctx context.Context, num int, qps []queryParam) <-chan []interface{} {
+func (wp *workProducer) run(ctx context.Context, num int, qps []query.Param) <-chan []interface{} {
 	resCh := make(chan []interface{}, 1000)
 	go func() {
 		defer close(resCh)
