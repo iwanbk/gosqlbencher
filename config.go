@@ -7,27 +7,19 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type config struct {
-	DataSourceName string
-	NumWorker      int
-	NumQuery       int
-}
-
 type plan struct {
-	DataSourceName string
-	NumWorker      int
-	Queries        []query.Query
+	DataSourceName string        `yaml:"data_source_name"`
+	NumWorker      int           `yaml:"num_worker"`
+	Queries        []query.Query `yaml:"queries"`
 }
 
-func readPlan(filename string) (*plan, error) {
+func readPlan(filename string) (p plan, err error) {
 	f, err := os.Open(filename)
 	if err != nil {
-		return nil, err
+		return
 	}
 	defer f.Close()
 
-	var p plan
-
 	err = yaml.NewDecoder(f).Decode(&p)
-	return &p, err
+	return
 }

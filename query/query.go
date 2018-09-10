@@ -2,6 +2,7 @@ package query
 
 // Query represents a database query
 type Query struct {
+	Name            string  `yaml:"name"`
 	NumQuery        int     `yaml:"num_query"`
 	Type            string  `yaml:"type"`
 	QueryStr        string  `yaml:"query_str"`
