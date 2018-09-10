@@ -22,6 +22,12 @@ var (
 )
 
 func main() {
+	p, err := readPlan("plan.yaml")
+	if err != nil {
+		log.Fatalf("failed to read plan: %v")
+	}
+	log.Printf("plan = %v", p)
+	return
 
 	db := initDB(cfg)
 
