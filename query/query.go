@@ -2,11 +2,12 @@ package query
 
 // Query represents a database query
 type Query struct {
-	Type          string
-	QueryStr      string
-	Params        []Param
-	Prepare       bool
-	PrepareOnInit bool
+	Type            string
+	QueryStr        string
+	Params          []Param
+	Prepare         bool
+	PrepareOnInit   bool
+	WithPlaceholder bool
 }
 
 // Param represents a database query param

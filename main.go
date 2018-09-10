@@ -29,8 +29,9 @@ func main() {
 	defer cancel()
 
 	query := query.Query{
-		Type:     "exec",
-		QueryStr: "insert into pgbench_accounts (aid,bid, abalance, filler)values($1, $2, $3,$4)",
+		Type: "exec",
+		//QueryStr: "insert into pgbench_accounts (aid,bid, abalance, filler)values($1, $2, $3,$4)",
+		QueryStr: "insert into pgbench_accounts (aid,bid, abalance, filler)values(%d, %d, %d,'%s')",
 		Params: []query.Param{
 			query.Param{
 				DataType: integerDataType,
@@ -46,8 +47,9 @@ func main() {
 				Prefix:   "name_",
 			},
 		},
-		Prepare:       true,
-		PrepareOnInit: true,
+		//WithPlaceholder: true,
+		//Prepare:       true,
+		//PrepareOnInit: true,
 	}
 
 	wp := &workProducer{}

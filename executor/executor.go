@@ -3,7 +3,6 @@ package executor
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/iwanbk/gosqlbencher/query"
 )
@@ -18,6 +17,6 @@ func New(db *sql.DB, q query.Query) (Executor, error) {
 	case q.Type == "exec" && q.Prepare:
 		return newPreparer(db, q)
 	default:
-		return nil, fmt.Errorf("unsupported query: %v", q)
+		return newExecer(db, q)
 	}
 }
