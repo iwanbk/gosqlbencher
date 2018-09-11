@@ -5,3 +5,11 @@
 [![codecov](https://codecov.io/gh/iwanbk/gosqlbencher/branch/master/graph/badge.svg)](https://codecov.io/gh/iwanbk/gosqlbencher)
 
 Benchmark your Go SQL ecosystem: query, driver, and server
+
+## How to use
+```bash
+$ ./gosqlbencher -h
+Usage of ./gosqlbencher:
+  -plan string
+        gosqlbencher plan file (default "plan.yaml")
+```

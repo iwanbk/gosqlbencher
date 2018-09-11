@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"flag"
 	"log"
 	"time"
 
@@ -13,8 +14,15 @@ import (
 	"github.com/iwanbk/gosqlbencher/query"
 )
 
+var (
+	planFile string
+)
+
 func main() {
-	pl, err := readPlan("plan.yaml")
+	flag.StringVar(&planFile, "plan", "plan.yaml", "gosqlbencher plan file")
+	flag.Parse()
+
+	pl, err := readPlan(planFile)
 	if err != nil {
 		log.Fatalf("failed to read plan: %v", err)
 	}
