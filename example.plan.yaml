@@ -1,16 +1,15 @@
 data_source_name: postgres://127.0.0.1:5432/example?sslmode=disable
 num_worker: 30
-num_query: 1000
 
 queries:
   - name: Insert with prepared statement on initialization
     type: exec
     num_query: 50000
     query_str: insert into pgbench_accounts (aid,bid, abalance, filler)values($1, $2, $3,$4)
-    with_placeholder: 
+    with_placeholder: true
     prepare: true
     prepare_on_init: true
-    params:
+    args:
       - name: aid
         data_type: integer
         gen_type: sequential

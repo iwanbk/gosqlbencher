@@ -46,8 +46,8 @@ func main() {
 
 func benchmarQuery(parent context.Context, db *sql.DB, pl plan, query query.Query) error {
 	var (
-		wp         = &workProducer{}
-		argsCh     = wp.run(parent, query.NumQuery, query.Params)
+		ap         = newArgsProducer()
+		argsCh     = ap.run(parent, query.NumQuery, query.Args)
 		group, ctx = errgroup.WithContext(parent)
 		_, cancel  = context.WithCancel(ctx)
 	)

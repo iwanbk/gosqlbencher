@@ -9,12 +9,6 @@ import (
 	"github.com/iwanbk/gosqlbencher/query"
 )
 
-var (
-	execerSupportedType = map[string]struct{}{
-		"exec": struct{}{},
-	}
-)
-
 type execer struct {
 	queryStr  string
 	queryType string
@@ -24,10 +18,6 @@ type execer struct {
 
 func newExecer(db *sql.DB, query query.Query) (*execer, error) {
 	qt := strings.ToLower(query.Type)
-
-	if _, ok := execerSupportedType[qt]; !ok {
-		return nil, fmt.Errorf("execer: unsupported query type: %s", query.Type)
-	}
 
 	ex := &execer{
 		db:        db,
@@ -42,30 +32,49 @@ func newExecer(db *sql.DB, query query.Query) (*execer, error) {
 	return ex, nil
 }
 
+// Execute implements Executor.Execute
 func (ex *execer) Execute(ctx context.Context, args ...interface{}) error {
 	return ex.execute(ctx, args...)
 }
 
+// Close implements Executor.Close
 func (ex *execer) Close() error {
 	return nil
 }
 
+// executeNoPlaceholder execute query with no placeholder in the query
 func (ex *execer) executeNoPlaceholder(ctx context.Context, args ...interface{}) error {
 	q := fmt.Sprintf(ex.queryStr, args...)
 	return ex.executeGeneric(ctx, q)
 }
 
+// executeWithPlaceholder execute query with  placeholder in the query
 func (ex *execer) executeWithPlaceholder(ctx context.Context, args ...interface{}) error {
 	return ex.executeGeneric(ctx, ex.queryStr, args...)
 }
 
-func (ex *execer) executeGeneric(ctx context.Context, query string, args ...interface{}) error {
+func (ex *execer) executeGeneric(ctx context.Context, queryStr string, args ...interface{}) error {
 	var err error
 	switch ex.queryType {
-	case "exec":
-		_, err = ex.db.ExecContext(ctx, query, args...)
+	case query.TypeExec:
+		_, err = ex.db.Exec(queryStr, args...)
+	case query.TypeExecContext:
+		_, err = ex.db.ExecContext(ctx, queryStr, args...)
+	case query.TypeQuery, query.TypeQueryContext:
+		var rows *sql.Rows
+		if ex.queryType == query.TypeQuery {
+			rows, err = ex.db.Query(queryStr, args...)
+		} else {
+			rows, err = ex.db.QueryContext(ctx, queryStr, args...)
+		}
+		if err != nil {
+			return err
+		}
+		for rows.Next() {
+		}
+		err = rows.Close()
 	default:
-		err = fmt.Errorf("execer: unsupported query type: %v", ex.queryType)
+		err = fmt.Errorf("execer 1: unsupported query type: %v", ex.queryType)
 	}
 	return err
 }
