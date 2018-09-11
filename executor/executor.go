@@ -14,11 +14,10 @@ type Executor interface {
 	Close() error
 }
 
+// New creates a new executor
 func New(db *sql.DB, q query.Query) (Executor, error) {
-	switch {
-	case q.Type == "exec" && q.Prepare:
+	if q.Prepare {
 		return newPreparer(db, q)
-	default:
-		return newExecer(db, q)
 	}
+	return newExecer(db, q)
 }
