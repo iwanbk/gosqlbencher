@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/iwanbk/gosqlbencher/query"
 	"github.com/stretchr/testify/require"
 )
 
@@ -12,12 +13,12 @@ func TestWorkProducerBasic(t *testing.T) {
 	const (
 		prefix = "name_"
 	)
-	qps := []queryParam{
-		queryParam{
+	qps := []query.Param{
+		query.Param{
 			DataType: integerDataType,
 			GenType:  sequentialGenType,
 		},
-		queryParam{
+		query.Param{
 			DataType: stringDataType,
 			GenType:  sequentialGenType,
 			Prefix:   prefix,

@@ -1,2 +1,3 @@
 gosqlbencher
 *.swp
+coverage.txt

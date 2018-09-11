@@ -46,6 +46,10 @@ func (ex *execer) Execute(ctx context.Context, args ...interface{}) error {
 	return ex.execute(ctx, args...)
 }
 
+func (ex *execer) Close() error {
+	return nil
+}
+
 func (ex *execer) executeNoPlaceholder(ctx context.Context, args ...interface{}) error {
 	q := fmt.Sprintf(ex.queryStr, args...)
 	return ex.executeGeneric(ctx, q)

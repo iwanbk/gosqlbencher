@@ -3,87 +3,99 @@ package main
 import (
 	"context"
 	"database/sql"
+	"flag"
 	"log"
 	"time"
 
 	_ "github.com/lib/pq"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/iwanbk/gosqlbencher/executor"
 	"github.com/iwanbk/gosqlbencher/query"
 )
 
 var (
-	numRows = int(5e4)
-	cfg     = config{
-		NumWorker:      30,
-		DataSourceName: "postgres://127.0.0.1:5432/example?sslmode=disable",
-		NumQuery:       10000,
-	}
+	planFile string
 )
 
 func main() {
+	flag.StringVar(&planFile, "plan", "plan.yaml", "gosqlbencher plan file")
+	flag.Parse()
 
-	db := initDB(cfg)
+	pl, err := readPlan(planFile)
+	if err != nil {
+		log.Fatalf("failed to read plan: %v", err)
+	}
+
+	log.Printf("Benchmarking\ndsn: %v\nNumWorker:%v\n",
+		pl.DataSourceName, pl.NumWorker)
+
+	db := initDB(pl)
+	defer db.Close()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	query := query.Query{
-		Type: "exec",
-		//QueryStr: "insert into pgbench_accounts (aid,bid, abalance, filler)values($1, $2, $3,$4)",
-		QueryStr: "insert into pgbench_accounts (aid,bid, abalance, filler)values(%d, %d, %d,'%s')",
-		Params: []query.Param{
-			query.Param{
-				DataType: integerDataType,
-			},
-			query.Param{
-				DataType: integerDataType,
-			},
-			query.Param{
-				DataType: integerDataType,
-			},
-			query.Param{
-				DataType: stringDataType,
-				Prefix:   "name_",
-			},
-		},
-		//WithPlaceholder: true,
-		//Prepare:       true,
-		//PrepareOnInit: true,
-	}
-
-	wp := &workProducer{}
-
-	runner, err := executor.New(db, query)
-	if err != nil {
-		log.Fatalf("failed to create executor: %v", err)
-	}
-
-	argsCh := wp.run(ctx, cfg.NumQuery, query.Params)
-
-	// insert to table
-	func() {
-		log.Println("Insert data")
-		start := time.Now()
-
-		for args := range argsCh {
-			err = runner.Execute(ctx, args...)
-			if err != nil {
-				log.Fatalf("error insert: %v", err)
-			}
+	for i, query := range pl.Queries {
+		err = benchmarQuery(ctx, db, pl, query)
+		if err != nil {
+			log.Fatalf("benchmarck query #%v failed: %v", i, err)
 		}
-		log.Println("Insert data - finished")
-		log.Printf("TPS = %v", float64(numRows)/time.Since(start).Seconds())
-	}()
-
-	// select with query
-
-	// delete
+	}
 }
 
-func initDB(cfg config) *sql.DB {
+func benchmarQuery(parent context.Context, db *sql.DB, pl plan, query query.Query) error {
+	var (
+		wp         = &workProducer{}
+		argsCh     = wp.run(parent, query.NumQuery, query.Params)
+		group, ctx = errgroup.WithContext(parent)
+		_, cancel  = context.WithCancel(ctx)
+	)
+	log.Printf("--------\n name: %v\n query string: %v\n num_query: %v\n "+
+		"prepare: %v\n prepare_on_init: %v\n with_placeholder: %v\n",
+		query.Name, query.QueryStr, query.NumQuery,
+		query.Prepare, query.PrepareOnInit, query.WithPlaceholder)
+
+	defer cancel()
+	start := time.Now()
+
+	for i := 0; i < pl.NumWorker; i++ {
+		group.Go(func() error {
+			runner, err := executor.New(db, query)
+			if err != nil {
+				return err
+			}
+			defer runner.Close()
+
+			for {
+				select {
+				case <-ctx.Done():
+					return nil
+				case args, ok := <-argsCh:
+					if !ok { // channel is closed, no more work
+						return nil
+					}
+
+					err = runner.Execute(ctx, args...)
+					if err != nil {
+						return err
+					}
+				}
+			}
+		})
+	}
+	err := group.Wait()
+	if err != nil {
+		return err
+	}
+
+	log.Printf("TPS = %v", float64(query.NumQuery)/time.Since(start).Seconds())
+	return nil
+}
+
+func initDB(pl plan) *sql.DB {
 	log.Println("Open DB")
-	db, err := sql.Open("postgres", cfg.DataSourceName)
+	db, err := sql.Open("postgres", pl.DataSourceName)
 	if err != nil {
 		log.Fatalf("failed to open db: %v", err)
 	}

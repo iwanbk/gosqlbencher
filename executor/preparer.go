@@ -58,3 +58,10 @@ func (p *preparer) Execute(ctx context.Context, args ...interface{}) error {
 	_, err = stmt.ExecContext(ctx, args...)
 	return err
 }
+
+func (p *preparer) Close() error {
+	if p.stmt == nil {
+		return nil
+	}
+	return p.stmt.Close()
+}
