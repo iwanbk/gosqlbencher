@@ -9,30 +9,30 @@ import (
 	"github.com/iwanbk/gosqlbencher/query"
 )
 
+// argsProducer defines the query arguments generator
 type argsProducer struct {
 }
 
+// newArgsProducer creates new argsProducer object
 func newArgsProducer() *argsProducer {
 	rand.Seed(time.Now().UnixNano())
 
 	return &argsProducer{}
 }
 
-func (ap *argsProducer) run(ctx context.Context, num int, qas []query.Arg) <-chan []interface{} {
+// run runs this producer in a goroutine and send the generated arguments
+// in the returned channel.
+// the channel will be closed after it finished generated the specified number of arguments
+func (ap *argsProducer) run(ctx context.Context, num int, args []query.Arg) <-chan []interface{} {
 	resCh := make(chan []interface{}, 1000)
 	go func() {
 		defer close(resCh)
+
+		// generate the params
 		for i := 1; i <= num; i++ {
-			// generate the params
 			var params []interface{}
-			for _, qa := range qas {
-				var param interface{}
-				switch qa.DataType {
-				case query.DataTypeInteger:
-					param = i
-				case query.DataTypeString:
-					param = fmt.Sprintf("%s%d", qa.Prefix, i)
-				}
+			for _, arg := range args {
+				param := ap.generateArg(i, arg)
 				params = append(params, param)
 			}
 
@@ -58,11 +58,12 @@ func (ap *argsProducer) generateArg(i int, qa query.Arg) interface{} {
 // generate random argument
 func (ap *argsProducer) generateRandomArg(i int, qa query.Arg) interface{} {
 	var param interface{}
+	randNum := rand.Intn(qa.RandomRangeMax-qa.RandomRangeMin+1) + qa.RandomRangeMin
 	switch qa.DataType {
 	case query.DataTypeInteger:
-		param = i
+		param = randNum
 	case query.DataTypeString:
-		param = fmt.Sprintf("%s%v", qa.Prefix, i)
+		param = fmt.Sprintf("%s%v", qa.Prefix, randNum)
 	}
 	return param
 }

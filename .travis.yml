@@ -3,9 +3,13 @@ language: go
 go:
   - 1.11.x
 
+# Skip the install step. Don't `go get` dependencies. Only build with the code
+# in vendor/
+install: true
+
 script:
   - go build
-  - bash codecov.sh
+  - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
