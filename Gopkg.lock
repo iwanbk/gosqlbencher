@@ -23,6 +23,18 @@
   version = "v1.0.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/proullon/ramsql"
+  packages = [
+    "driver",
+    "engine",
+    "engine/log",
+    "engine/parser",
+    "engine/protocol"
+  ]
+  revision = "185fd3b308f9b64d4115f27d80122a5601fba412"
+
+[[projects]]
   name = "github.com/stretchr/testify"
   packages = [
     "assert",
@@ -52,6 +64,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3f0fff6a44e32101f88f527c69192eed228720faa90b62a86f590e1871664a2d"
+  inputs-digest = "f769646ff369a8196f7e3337e766237299336f3de720fa11903cf2e4bddf4c88"
   solver-name = "gps-cdcl"
   solver-version = 1
