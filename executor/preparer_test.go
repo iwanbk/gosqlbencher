@@ -26,7 +26,7 @@ func TestPreparer(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		queryType     string
+		queryType     query.TypeType
 		queryStr      string
 		args          []interface{}
 		prepareOnInit bool

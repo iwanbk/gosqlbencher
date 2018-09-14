@@ -10,10 +10,11 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/iwanbk/gosqlbencher/executor"
+	"github.com/iwanbk/gosqlbencher/plan"
 	"github.com/iwanbk/gosqlbencher/query"
 )
 
-func benchmarQuery(parent context.Context, db *sql.DB, pl plan, query query.Query) error {
+func benchmarQuery(parent context.Context, db *sql.DB, pl plan.Plan, query query.Query) error {
 	var (
 		ap         = newArgsProducer()
 		argsCh     = ap.run(parent, query.NumQuery, query.Args)
@@ -58,7 +59,7 @@ func benchmarQuery(parent context.Context, db *sql.DB, pl plan, query query.Quer
 
 	timeNeeded := time.Since(start)
 	log.Printf("Query time       : %v", timeNeeded.String())
-	log.Printf("Query per second : %v", float64(query.NumQuery)/timeNeeded.Seconds())
+	log.Printf("Query per second : %.2f", float64(query.NumQuery)/timeNeeded.Seconds())
 	return nil
 }
 

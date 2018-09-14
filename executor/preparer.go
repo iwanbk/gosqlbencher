@@ -10,7 +10,7 @@ import (
 
 type preparer struct {
 	stmt      *sql.Stmt
-	queryType string
+	queryType query.TypeType
 	stmtStr   string
 	db        *sql.DB
 }
