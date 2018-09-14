@@ -4,25 +4,22 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"strings"
 
 	"github.com/iwanbk/gosqlbencher/query"
 )
 
 type execer struct {
 	queryStr  string
-	queryType string
+	queryType query.TypeType
 	db        *sql.DB
 	execute   func(ctx context.Context, args ...interface{}) error
 }
 
 func newExecer(db *sql.DB, query query.Query) (*execer, error) {
-	qt := strings.ToLower(query.Type)
-
 	ex := &execer{
 		db:        db,
 		queryStr:  query.QueryStr,
-		queryType: qt,
+		queryType: query.Type,
 	}
 	if query.WithPlaceholder {
 		ex.execute = ex.executeWithPlaceholder

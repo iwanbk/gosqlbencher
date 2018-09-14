@@ -1,37 +1,50 @@
 package query
 
+// TypeType is the type for query type
+type TypeType string
+
 const (
 	// TypeExec is type of query which will executes db.Exec command
 	// https://golang.org/pkg/database/sql/#DB.Exec
-	TypeExec = "exec"
+	TypeExec TypeType = "exec"
 
 	// TypeExecContext is type of query which will executes db.ExecContext command
 	// https://golang.org/pkg/database/sql/#DB.ExecContext
-	TypeExecContext = "exec_context"
+	TypeExecContext TypeType = "exec_context"
 
 	// TypeQuery is type of query which will executes db.Query command
 	// https://golang.org/pkg/database/sql/#DB.Query
-	TypeQuery = "query"
+	TypeQuery TypeType = "query"
 
 	// TypeQueryContext is type of query which will executes db.QueryContext command
 	// https://golang.org/pkg/database/sql/#DB.QueryContext
-	TypeQueryContext = "query_context"
+	TypeQueryContext TypeType = "query_context"
 )
+
+// DataType is the data type of the query argument
+type DataType string
 
 const (
 	// DataTypeInteger is query argument with data type = integer
-	DataTypeInteger = "integer"
+	DataTypeInteger DataType = "integer"
 
 	// DataTypeString is query argument with data type = string
-	DataTypeString = "string"
+	DataTypeString DataType = "string"
 )
+
+// GenType is the method used to generate the argument
+type GenType string
 
 const (
 	// GenTypeSequential define argument generator in sequential mode
-	GenTypeSequential = "sequential"
+	//		integer: query number
+	//		string : prefix + query number
+	GenTypeSequential GenType = "sequential"
 
 	// GenTypeRandom define argument generator in random mode
-	GenTypeRandom = "random"
+	//		integer: between specified range
+	//		string : prefix + integer between specified range
+	GenTypeRandom GenType = "random"
 )
 
 // Query represents a database query
@@ -43,7 +56,7 @@ type Query struct {
 	NumQuery int `yaml:"num_query"`
 
 	// Query type
-	Type string `yaml:"type"`
+	Type TypeType `yaml:"type"`
 
 	// Query string
 	QueryStr string `yaml:"query_str"`
@@ -64,18 +77,13 @@ type Query struct {
 
 // Arg represents a database query arg
 type Arg struct {
-	// arg data type, currently supported type:
-	//	- integer
-	// 	- string
-	DataType string `yaml:"data_type"`
+	// arg data type
+	DataType DataType `yaml:"data_type"`
 
 	// arg generation mode:
 	// sequential:
-	//		integer: query number
-	//		string : prefix + query number
 	// random:
-	//		integer: between specified range
-	GenType string `yaml:"gen_type"`
+	GenType GenType `yaml:"gen_type"`
 
 	// Prefix used to generate string arg
 	// the argument will be prefixed with the given prefix

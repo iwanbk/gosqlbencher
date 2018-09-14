@@ -7,6 +7,8 @@ import (
 	"log"
 
 	_ "github.com/lib/pq"
+
+	"github.com/iwanbk/gosqlbencher/plan"
 )
 
 var (
@@ -17,7 +19,7 @@ func main() {
 	flag.StringVar(&planFile, "plan", "plan.yaml", "gosqlbencher plan file")
 	flag.Parse()
 
-	pl, err := readPlan(planFile)
+	pl, err := plan.Read(planFile)
 	if err != nil {
 		log.Fatalf("failed to read plan: %v", err)
 	}
@@ -39,7 +41,7 @@ func main() {
 	}
 }
 
-func initDB(pl plan) *sql.DB {
+func initDB(pl plan.Plan) *sql.DB {
 	log.Println("Open DB")
 	db, err := sql.Open("postgres", pl.DataSourceName)
 	if err != nil {

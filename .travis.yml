@@ -5,9 +5,11 @@ go:
 
 # Skip the install step. Don't `go get` dependencies. Only build with the code
 # in vendor/
-install: true
+install:
+  - go get -u golang.org/x/lint/golint
 
 script:
+  - make lint
   - go build
   - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 

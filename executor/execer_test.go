@@ -25,7 +25,7 @@ func TestExecer(t *testing.T) {
 
 	testCases := []struct {
 		name            string
-		queryType       string
+		queryType       query.TypeType
 		queryStr        string
 		withPlaceHolder bool
 		args            []interface{}

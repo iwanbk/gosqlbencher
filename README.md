@@ -84,17 +84,19 @@ Usage of ./gosqlbencher:
 
 Create test table and execute `insert` test
 ```bash
-./gosqlbencher -plan=insert.plan.yaml
+./gosqlbencher -plan=examples/insert.plan.yaml
 ```
 
 Execute various `select` tests
 ```bash
-./gosqlbencher -plan=query.plan.yaml 
+./gosqlbencher -plan=examples/query.plan.yaml
 ```
 
 ## Configuration
 
-TODO
+The best docs for the configuration right now is the `godoc` page for [`Plan`](https://godoc.org/github.com/iwanbk/gosqlbencher/plan#Plan).
+
+There are also benchmark plan examples in [examples](./examples) directory.
 
 ## TODO
 
