@@ -10,11 +10,10 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/iwanbk/gosqlbencher/executor"
-	"github.com/iwanbk/gosqlbencher/plan"
 	"github.com/iwanbk/gosqlbencher/query"
 )
 
-func benchmarQuery(parent context.Context, db *sql.DB, pl plan.Plan, query query.Query) error {
+func benchmarQuery(parent context.Context, db *sql.DB, numWorker int, query query.Query) error {
 	var (
 		ap         = newArgsProducer()
 		argsCh     = ap.run(parent, query.NumQuery, query.Args)
@@ -27,31 +26,12 @@ func benchmarQuery(parent context.Context, db *sql.DB, pl plan.Plan, query query
 	defer cancel()
 	start := time.Now()
 
-	for i := 0; i < pl.NumWorker; i++ {
+	for i := 0; i < numWorker; i++ {
 		group.Go(func() error {
-			runner, err := executor.New(db, query)
-			if err != nil {
-				return err
-			}
-			defer runner.Close()
-
-			for {
-				select {
-				case <-ctx.Done():
-					return nil
-				case args, ok := <-argsCh:
-					if !ok { // channel is closed, no more work
-						return nil
-					}
-
-					err = runner.Execute(ctx, args...)
-					if err != nil {
-						return err
-					}
-				}
-			}
+			return runExecutor(ctx, db, query, argsCh)
 		})
 	}
+
 	err := group.Wait()
 	if err != nil {
 		return err
@@ -61,6 +41,31 @@ func benchmarQuery(parent context.Context, db *sql.DB, pl plan.Plan, query query
 	log.Printf("Query time       : %v", timeNeeded.String())
 	log.Printf("Query per second : %.2f", float64(query.NumQuery)/timeNeeded.Seconds())
 	return nil
+}
+
+func runExecutor(ctx context.Context, db *sql.DB, query query.Query, argsCh <-chan []interface{}) error {
+	runner, err := executor.New(db, query)
+	if err != nil {
+		return err
+	}
+	defer runner.Close()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		case args, ok := <-argsCh:
+			if !ok { // channel is closed, no more work
+				return nil
+			}
+
+			err = runner.Execute(ctx, args...)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 }
 
 func printBenchmarkQueryHeader(query query.Query) {
