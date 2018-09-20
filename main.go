@@ -34,7 +34,7 @@ func main() {
 	defer cancel()
 
 	for i, query := range pl.Queries {
-		err = benchmarQuery(ctx, db, pl, query)
+		err = benchmarQuery(ctx, db, pl.NumWorker, query)
 		if err != nil {
 			log.Fatalf("benchmarck query #%v failed: %v", i, err)
 		}
