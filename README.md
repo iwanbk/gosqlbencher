@@ -51,8 +51,8 @@ Supported query modes:
 Easily switch between supported drivers and see the difference.
 
 Supported drivers:
-- [x] github.com/lib/pq
-- [ ] github.com/jackc/pgx
+- [x] github.com/lib/pq (driver_name : postgres)
+- [x] github.com/jackc/pgx (driver_name : pgx)
 - [ ] github.com/mattn/go-sqlite3
 - [ ] github.com/ziutek/mymysql
 - [ ] github.com/go-sql-driver/mysql
@@ -103,3 +103,4 @@ There are also benchmark plan examples in [examples](./examples) directory.
 - profiling
 - all `TODO` Above
 - all unchecked mark above
+- plan file validation

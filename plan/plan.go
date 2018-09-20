@@ -9,6 +9,12 @@ import (
 
 // Plan define the gosqlbencher benchmark plan
 type Plan struct {
+	// DriverName is the name of the sql driver.
+	// Supported drivers:
+	// - postgres : https://github.com/lib/pq
+	// - pgx : https://github.com/jackc/pgx
+	DriverName string `yaml:"driver_name"`
+
 	// DataSourceName is data source or connection string of the database
 	// being tested
 	DataSourceName string `yaml:"data_source_name"`

@@ -2,11 +2,8 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"flag"
 	"log"
-
-	_ "github.com/lib/pq"
 
 	"github.com/iwanbk/gosqlbencher/plan"
 )
@@ -19,39 +16,31 @@ func main() {
 	flag.StringVar(&planFile, "plan", "plan.yaml", "gosqlbencher plan file")
 	flag.Parse()
 
+	// read config
 	pl, err := plan.Read(planFile)
 	if err != nil {
 		log.Fatalf("failed to read plan: %v", err)
 	}
 
+	// print some nice message
 	log.Printf("Benchmarking\ndsn: %v\nNumWorker:%v\n",
 		pl.DataSourceName, pl.NumWorker)
 
-	db := initDB(pl)
+	// open DB
+	db, err := openDB(pl.DriverName, pl.DataSourceName)
+	if err != nil {
+		log.Fatalf("failed to open database:%v", err)
+	}
 	defer db.Close()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	// run the benchmarks
 	for i, query := range pl.Queries {
 		err = benchmarQuery(ctx, db, pl.NumWorker, query)
 		if err != nil {
 			log.Fatalf("benchmarck query #%v failed: %v", i, err)
 		}
 	}
-}
-
-func initDB(pl plan.Plan) *sql.DB {
-	log.Println("Open DB")
-	db, err := sql.Open("postgres", pl.DataSourceName)
-	if err != nil {
-		log.Fatalf("failed to open db: %v", err)
-	}
-
-	log.Println("Ping DB")
-	err = db.Ping()
-	if err != nil {
-		log.Fatalf("failed to ping db: %v", err)
-	}
-	return db
 }
