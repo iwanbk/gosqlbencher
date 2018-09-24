@@ -64,6 +64,8 @@ func (ap *argsProducer) generateRandomArg(i int, qa query.Arg) interface{} {
 		param = randNum
 	case query.DataTypeString:
 		param = fmt.Sprintf("%s%v", qa.Prefix, randNum)
+	case query.DataTypeTime:
+		param = time.Now() // it always return time.Now()
 	}
 	return param
 }
@@ -76,6 +78,8 @@ func (ap *argsProducer) generateSeqArg(i int, qa query.Arg) interface{} {
 		param = i
 	case query.DataTypeString:
 		param = fmt.Sprintf("%s%v", qa.Prefix, i)
+	case query.DataTypeTime:
+		param = time.Now() // it always return time.Now()
 	}
 	return param
 }

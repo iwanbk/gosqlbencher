@@ -6,12 +6,12 @@ queries:
   - name: create db
     type: exec
     num_query: 1
-    query_str: CREATE TABLE IF NOT EXISTS address (id BIGSERIAL PRIMARY KEY, street TEXT, number INT)
+    query_str: CREATE TABLE IF NOT EXISTS address (id BIGSERIAL PRIMARY KEY, street TEXT, number INT, time timestamp)
 
   - name: Insert with prepared statement on initialization
     type: exec
     num_query: 50000
-    query_str: insert into address (street, number) values ($1, $2)
+    query_str: insert into address (street, number, time) values ($1, $2, $3)
     with_placeholder: true
     prepare: true
     prepare_on_init: true
@@ -23,3 +23,5 @@ queries:
       - name: number
         data_type: integer
         gen_type: sequential
+      - name: time
+        data_type: time

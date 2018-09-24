@@ -25,11 +25,18 @@ const (
 type DataType string
 
 const (
-	// DataTypeInteger is query argument with data type = integer
+	// DataTypeInteger is query argument with data type = integer.
+	// It is equivalent to Go's `int`
 	DataTypeInteger DataType = "integer"
 
-	// DataTypeString is query argument with data type = string
+	// DataTypeString is query argument with data type = string.
+	// It is equivalent to Go's string
 	DataTypeString DataType = "string"
+
+	// DataTypeTime is query argument with data type = timestamp.
+	// It is equivalent to Go's time.Time and will always
+	// be converted to time.Now()
+	DataTypeTime DataType = "time"
 )
 
 // GenType is the method used to generate the argument
