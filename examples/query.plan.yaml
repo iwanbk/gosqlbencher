@@ -9,7 +9,7 @@ queries:
     query_str: select * from address where number > $1 limit 10
     with_placeholder: true
     prepare: true
-    prepare_on_init: true
+    prepare_on_init: true   # create prepared statement once on initialization
     args:
      - name: number
        data_type: integer
@@ -23,10 +23,23 @@ queries:
     query_str: select * from address where number > %d limit 10
     with_placeholder: false
     prepare: false
-    prepare_on_init: false
     args:
       - name: number
         data_type: integer
         gen_type: random
         random_range_min: 10
         random_range_max: 30
+
+  - name: select randomly with placeholder without prepare
+    type: query
+    num_query: 15000
+    query_str: select * from address where number > $1 limit 10
+    with_placeholder: true
+    prepare: true
+    prepare_on_init: false # create prepared statement just before executing the query
+    args:
+     - name: number
+       data_type: integer
+       gen_type: random
+       random_range_min: 10
+       random_range_max: 30
