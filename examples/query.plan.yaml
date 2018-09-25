@@ -14,8 +14,8 @@ queries:
      - name: number
        data_type: integer
        gen_type: random
-       random_range_min: 10
-       random_range_max: 30
+       min: 10
+       max: 30
       
   - name: select randomly as plain query
     type: query
@@ -27,8 +27,8 @@ queries:
       - name: number
         data_type: integer
         gen_type: random
-        random_range_min: 10
-        random_range_max: 30
+        min: 10
+        max: 30
 
   - name: select randomly with placeholder without prepare
     type: query
@@ -41,5 +41,5 @@ queries:
      - name: number
        data_type: integer
        gen_type: random
-       random_range_min: 10
-       random_range_max: 30
+       min: 10
+       max: 30

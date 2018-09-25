@@ -44,12 +44,12 @@ type GenType string
 
 const (
 	// GenTypeSequential define argument generator in sequential mode
-	//		integer: query number
+	//		integer: query number + Arg.Min
 	//		string : prefix + query number
 	GenTypeSequential GenType = "sequential"
 
 	// GenTypeRandom define argument generator in random mode
-	//		integer: between specified range
+	//		integer: between specified range (min-max)
 	//		string : prefix + integer between specified range
 	GenTypeRandom GenType = "random"
 )
@@ -97,9 +97,9 @@ type Arg struct {
 	// appended with query number
 	Prefix string `yaml:"prefix"`
 
-	// max value of generated random value
-	RandomRangeMax int `yaml:"random_range_hi"`
+	// min value of generated argument
+	Min int `yaml:"min"`
 
-	// min value of generated random value
-	RandomRangeMin int `yaml:"random_range_low"`
+	// max value of generated random value
+	Max int `yaml:"max"`
 }

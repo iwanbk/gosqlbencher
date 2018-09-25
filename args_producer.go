@@ -58,7 +58,7 @@ func (ap *argsProducer) generateArg(i int, qa query.Arg) interface{} {
 // generate random argument
 func (ap *argsProducer) generateRandomArg(i int, qa query.Arg) interface{} {
 	var param interface{}
-	randNum := rand.Intn(qa.RandomRangeMax-qa.RandomRangeMin+1) + qa.RandomRangeMin
+	randNum := rand.Intn(qa.Max-qa.Min+1) + qa.Min
 	switch qa.DataType {
 	case query.DataTypeInteger:
 		param = randNum
@@ -75,9 +75,9 @@ func (ap *argsProducer) generateSeqArg(i int, qa query.Arg) interface{} {
 	var param interface{}
 	switch qa.DataType {
 	case query.DataTypeInteger:
-		param = i
+		param = i + qa.Min
 	case query.DataTypeString:
-		param = fmt.Sprintf("%s%v", qa.Prefix, i)
+		param = fmt.Sprintf("%s%v", qa.Prefix, i+qa.Min)
 	case query.DataTypeTime:
 		param = time.Now() // it always return time.Now()
 	}
