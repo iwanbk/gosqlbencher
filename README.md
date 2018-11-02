@@ -100,7 +100,7 @@ There are also benchmark plan examples in [examples](./examples) directory.
 
 ## TODO
 
-- profiling
+- promag
 - all `TODO` Above
 - all unchecked mark above
 - plan file validation
