@@ -7,7 +7,7 @@ import (
 )
 
 func TestRead(t *testing.T) {
-	pl, err := Read("../examples/insert.plan.yaml")
+	pl, err := Read("../examples/insert.plan.postgre.yaml")
 	require.NoError(t, err)
 
 	require.NotEmpty(t, pl.Queries)
