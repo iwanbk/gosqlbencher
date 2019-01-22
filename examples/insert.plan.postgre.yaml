@@ -1,0 +1,33 @@
+driver_name : postgres
+data_source_name: postgres://gosqlbencher@127.0.0.1:5432/example?sslmode=disable
+num_worker: 30
+max_open_conns: 10
+
+queries:
+  - name: drop db
+    type: exec
+    num_query: 1
+    query_str: DROP TABLE IF EXISTS address
+
+  - name: create db
+    type: exec
+    num_query: 1
+    query_str: CREATE TABLE IF NOT EXISTS address (id BIGSERIAL PRIMARY KEY, street TEXT, number INT, time timestamp)
+
+  - name: Insert with prepared statement on initialization
+    type: exec
+    num_query: 50000
+    query_str: insert into address (street, number, time) values ($1, $2, $3)
+    with_placeholder: true
+    prepare: true
+    prepare_on_init: true
+    args:
+      - name: street
+        data_type: string
+        prefix: road_
+        gen_type: sequential
+      - name: number
+        data_type: integer
+        gen_type: sequential
+      - name: time
+        data_type: time

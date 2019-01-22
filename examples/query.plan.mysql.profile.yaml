@@ -1,0 +1,20 @@
+driver_name : mysql
+data_source_name: user:password@tcp(localhost:3306)/db?tls=skip-verify
+#data_source_name: tcp:localhost:3306*db/user/password # for ziutek/mymysql
+num_worker: 30
+max_open_conns: 10
+
+queries:
+  - name: select randomly with prepare
+    type: query
+    num_query: 15000
+    query_str: select * from address where number > ? limit 10
+    with_placeholder: true
+    prepare: true
+    prepare_on_init: false   # don't create prepared statement once on initialization
+    args:
+     - name: number
+       data_type: integer
+       gen_type: random
+       min: 10
+       max: 30

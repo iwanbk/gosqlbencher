@@ -1,17 +1,22 @@
-driver_name : postgres
-data_source_name: postgres://127.0.0.1:5432/example?sslmode=disable
+driver_name : mysql
+data_source_name: user:password@tcp(localhost:3306)/db?tls=skip-verify
 num_worker: 30
 
 queries:
+  - name: drop db
+    type: exec
+    num_query: 1
+    query_str: DROP TABLE IF EXISTS address
+
   - name: create db
     type: exec
     num_query: 1
-    query_str: CREATE TABLE IF NOT EXISTS address (id BIGSERIAL PRIMARY KEY, street TEXT, number INT, time timestamp)
+    query_str: CREATE TABLE IF NOT EXISTS address (id int NOT NULL AUTO_INCREMENT, street TEXT, number INT, time timestamp, primary key(id))
 
   - name: Insert with prepared statement on initialization
     type: exec
-    num_query: 50000
-    query_str: insert into address (street, number, time) values ($1, $2, $3)
+    num_query: 5000
+    query_str: insert into address (street, number, time) values (?, ?, ?)
     with_placeholder: true
     prepare: true
     prepare_on_init: true

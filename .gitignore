@@ -1,3 +1,4 @@
 gosqlbencher
 *.swp
 coverage.txt
+prof

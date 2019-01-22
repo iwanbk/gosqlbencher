@@ -1,6 +1,7 @@
 driver_name : postgres
-data_source_name: postgres://127.0.0.1:5432/example?sslmode=disable
+data_source_name: postgres://gosqlbencher@127.0.0.1:5432/example?sslmode=disable
 num_worker: 30
+max_open_conns: 10
 
 queries:
   - name: select randomly with prepare

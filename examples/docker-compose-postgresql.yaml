@@ -1,0 +1,11 @@
+version:  "3.2"
+
+services:
+    postgres:
+        image: postgres:10.4-alpine
+        environment:
+            POSTGRES_DB: example
+            POSTGRES_USER: gosqlbencher
+        container_name: postgres-gosqlbencher
+        ports:
+            - 5432:5432

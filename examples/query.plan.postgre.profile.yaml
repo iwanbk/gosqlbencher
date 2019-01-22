@@ -1,0 +1,19 @@
+driver_name : postgres
+data_source_name: postgres://gosqlbencher@127.0.0.1:5432/example?sslmode=disable
+num_worker: 30 # number of goroutines, it simulates number of concurrent requests
+max_open_conns: 10 # max number of open connections to the databases, 0 means unlimited
+
+queries:
+  - name: select randomly with prepare
+    type: query
+    num_query: 15000
+    query_str: select * from address where number > $1 limit 10
+    with_placeholder: true
+    prepare: true
+    prepare_on_init: false  # don't create prepared statement once on initialization
+    args:
+     - name: number
+       data_type: integer
+       gen_type: random
+       min: 10
+       max: 30

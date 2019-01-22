@@ -23,6 +23,11 @@ type Plan struct {
 	// It simulates number of concurrent queries in our system
 	NumWorker int `yaml:"num_worker"`
 
+	// MaxOpenConns define the maximum number of open connections to the database.
+	// The benchmarker will call https://golang.org/pkg/database/sql/#DB.SetMaxOpenConns
+	// with this field as the argument
+	MaxOpenConns int `yaml:"max_open_conns"`
+
 	// Queries is sequence of queries we want to test
 	Queries []query.Query `yaml:"queries"`
 }
