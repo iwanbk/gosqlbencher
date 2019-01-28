@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/iwanbk/gosqlbencher)](https://goreportcard.com/report/github.com/iwanbk/gosqlbencher)
 [![codecov](https://codecov.io/gh/iwanbk/gosqlbencher/branch/master/graph/badge.svg)](https://codecov.io/gh/iwanbk/gosqlbencher)
 
-Tool to benchmark your Go SQL ecosystem: query, driver, and the server.
+Tool to benchmark Go SQL ecosystem: query, [database/sql](https://golang.org/pkg/database/sql/)funcs usage, driver, and the server.
 
 ## Why using this tool 
 
@@ -70,6 +70,28 @@ In web application, it simulates the number of concurrent requests you have at a
 
 It could generate Go profiling data with `prof-mode` option, so we could have better insight about how SQL package work under various scenarios.
 
+## Configuration
+
+The `gosqlbencher` configuration is called `plan` file. It is called `plan` instead of `config` because it is not a mere config, it contatins the benchmarking procedures to be executed by `gosqlbencher`.
+
+The best docs for the configuration right now is the `godoc` page for [`Plan`](https://godoc.org/github.com/iwanbk/gosqlbencher/plan#Plan).
+
+There are also benchmark plan examples in [examples](./examples) directory.
+
+## How It Works
+
+1. Query is benchmarked by allowing query to be specified in the plan file. It supports two mode on substituing the value in query:
+- placholder: something like `$1` in postgresql or `?` in mysql is supported
+- standard Go `fmt`: using `%d` for integer or `%s` for string
+
+The value will then be generated `randomly` or `sequentially` on execution, it depends on the plan file.
+
+2. [database/sql](https://golang.org/pkg/database/sql/) funcs usage is benchmarked by supporting below query execution:
+- prepare on initialization: query will be executed in prepared statement, which will only be created on initialization
+- prepare: prepared statement will be executed right before executing the query
+- SQL placholder usage
+- Plain query without SQL placeholder, possibly using Go formatting
+
 ## Quick Start
 
 Build
@@ -123,12 +145,6 @@ Check the `pdf` in `~/Desktop/cpuprof.pd`
 Try different scenario in the `plan` file and compare the profiling data & performance, for example:
 - set different number of `max_open_conns`
 - set `prepare_on_init` to `true`: it usually will improve the performance
-
-## Configuration
-
-The best docs for the configuration right now is the `godoc` page for [`Plan`](https://godoc.org/github.com/iwanbk/gosqlbencher/plan#Plan).
-
-There are also benchmark plan examples in [examples](./examples) directory.
 
 ## TODO
 
