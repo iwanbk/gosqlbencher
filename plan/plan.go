@@ -13,6 +13,8 @@ type Plan struct {
 	// Supported drivers:
 	// - postgres : https://github.com/lib/pq
 	// - pgx : https://github.com/jackc/pgx
+	// - mymysql: https://github.com/ziutek/mymysql
+	// - mysql: https://github.com/go-sql-driver/mysql
 	DriverName string `yaml:"driver_name"`
 
 	// DataSourceName is data source or connection string of the database

@@ -53,9 +53,9 @@ Easily switch between supported drivers and see the difference.
 Supported drivers:
 - [x] github.com/lib/pq (driver_name : postgres)
 - [x] github.com/jackc/pgx (driver_name : pgx)
-- [x] github.com/mattn/go-sqlite3
-- [x] github.com/ziutek/mymysql
-- [ ] github.com/go-sql-driver/mysql
+- [x] github.com/ziutek/mymysql (driver name: mymysql)
+- [x] github.com/go-sql-driver/mysql (driver name: mysql)
+- [] github.com/mattn/go-sqlite3
 
 #### Database Settings
 
@@ -91,6 +91,14 @@ The value will then be generated `randomly` or `sequentially` on execution, it d
 - prepare: prepared statement will be executed right before executing the query
 - SQL placholder usage
 - Plain query without SQL placeholder, possibly using Go formatting
+
+3. Driver could be specified as well in the plan file, so we could easily see the performance between drivers.
+
+See [driver](#driver) section to see the list of available drivers
+
+4. Database Settings
+
+Current database setting supported is only max open connections, which can be configured in the plan file.
 
 ## Quick Start
 
