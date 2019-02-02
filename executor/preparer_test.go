@@ -5,14 +5,12 @@ import (
 	"database/sql"
 	"testing"
 
+	"github.com/iwanbk/gosqlbencher/query"
 	_ "github.com/proullon/ramsql/driver"
 	"github.com/stretchr/testify/require"
-
-	"github.com/iwanbk/gosqlbencher/query"
 )
 
 func TestPreparer(t *testing.T) {
-	//db, err := sql.Open("sqlite3", "file::memory:?mode=memory&cache=shared")
 	db, err := sql.Open("ramsql", "TestPrepare")
 	require.NoError(t, err)
 	defer db.Close()

@@ -25,10 +25,7 @@ func newPreparer(db *sql.DB, query query.Query) (*preparer, error) {
 		return &p, nil
 	}
 
-	if err := p.initStmt(); err != nil {
-		return nil, err
-	}
-	return &p, nil
+	return &p, p.initStmt()
 }
 
 func (p *preparer) initStmt() error {

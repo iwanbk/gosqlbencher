@@ -33,14 +33,11 @@ func benchmarQuery(parent context.Context, db *sql.DB, numWorker int, query quer
 	}
 
 	err := group.Wait()
-	if err != nil {
-		return err
-	}
 
 	timeNeeded := time.Since(start)
 	log.Printf("Query time       : %v", timeNeeded.String())
 	log.Printf("Query per second : %.2f", float64(query.NumQuery)/timeNeeded.Seconds())
-	return nil
+	return err
 }
 
 func runExecutor(ctx context.Context, db *sql.DB, query query.Query, argsCh <-chan []interface{}) error {

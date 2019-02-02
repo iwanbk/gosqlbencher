@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestWorkProducerSequential(t *testing.T) {
+func TestArgsProducerSequential(t *testing.T) {
 	const (
 		prefix = "name_"
 	)
@@ -47,13 +47,14 @@ func TestWorkProducerSequential(t *testing.T) {
 		require.Equal(t, num+qps[0].Min, args[0])
 		require.Equal(t, fmt.Sprintf("%s%d", prefix, num+qps[1].Min), args[1])
 
+		// check the generated time
 		generatedTime := args[2].(time.Time)
 		require.True(t, generatedTime.After(start))
 		require.True(t, generatedTime.Before(time.Now()))
 	}
 }
 
-func TestWorkProducerRandom(t *testing.T) {
+func TestArgsProducerRandom(t *testing.T) {
 	qps := []query.Arg{
 		{
 			DataType: query.DataTypeInteger,
@@ -68,6 +69,10 @@ func TestWorkProducerRandom(t *testing.T) {
 			Min:      20,
 			Max:      30,
 		},
+		{
+			DataType: query.DataTypeTime,
+			GenType:  query.GenTypeRandom,
+		},
 	}
 	var (
 		ctx          = context.Background()
@@ -77,6 +82,7 @@ func TestWorkProducerRandom(t *testing.T) {
 		num          int
 	)
 
+	start := time.Now()
 	argsCh := wp.run(ctx, numWorks, qps)
 	for args := range argsCh {
 		num++
@@ -93,5 +99,37 @@ func TestWorkProducerRandom(t *testing.T) {
 		require.NoError(t, err)
 		require.True(t, randomNum >= qps[1].Min)
 		require.True(t, randomNum <= qps[1].Max)
+
+		// check the generated time
+		// we are still using sequential time
+		generatedTime := args[2].(time.Time)
+		require.True(t, generatedTime.After(start))
+		require.True(t, generatedTime.Before(time.Now()))
+
 	}
+}
+
+// Test that the args producer can be correctly cancelled
+func TestArgsProducerContextCancelation(t *testing.T) {
+	qps := []query.Arg{
+		{
+			DataType: query.DataTypeInteger,
+			GenType:  query.GenTypeRandom,
+			Min:      10,
+			Max:      20,
+		},
+	}
+	var (
+		wp       = newArgsProducer()
+		numWorks = 10000
+		num      int
+	)
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	argsCh := wp.run(ctx, numWorks, qps)
+	for _ = range argsCh {
+		num++
+	}
+	require.Zero(t, num)
 }
