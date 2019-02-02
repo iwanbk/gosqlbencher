@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
+	"fmt"
 	"log"
 
 	"github.com/iwanbk/gosqlbencher/plan"
@@ -23,30 +25,10 @@ func main() {
 
 	// profiling
 	if profMode != "" {
-		if profDir == "" {
-			log.Fatal("prof-dir can't be empty")
+		options, err := getProfOpts(profMode, profDir)
+		if err != nil {
+			log.Fatalf("failed to get prof options: %v", err)
 		}
-
-		var (
-			options    []func(*profile.Profile)
-			modeOption func(*profile.Profile)
-		)
-
-		switch profMode {
-		case "block":
-			modeOption = profile.BlockProfile
-		case "cpu":
-			modeOption = profile.CPUProfile
-		case "mem":
-			modeOption = profile.MemProfile
-		case "mutex":
-			modeOption = profile.MutexProfile
-		default:
-			log.Fatalf("invalid profiling mode: %s", profMode)
-		}
-		options = append(options, modeOption)
-
-		options = append(options, profile.ProfilePath(profDir))
 		defer profile.Start(options...).Stop()
 	}
 
@@ -80,3 +62,33 @@ func main() {
 		}
 	}
 }
+
+func getProfOpts(profMode, profDir string) ([]func(*profile.Profile), error) {
+	if profDir == "" {
+		return nil, errEmptyProfDir
+	}
+
+	var (
+		options    []func(*profile.Profile)
+		modeOption func(*profile.Profile)
+	)
+
+	switch profMode {
+	case "block":
+		modeOption = profile.BlockProfile
+	case "cpu":
+		modeOption = profile.CPUProfile
+	case "mem":
+		modeOption = profile.MemProfile
+	case "mutex":
+		modeOption = profile.MutexProfile
+	default:
+		return nil, fmt.Errorf("invalid profiling mode: %s", profMode)
+	}
+	options = append(options, modeOption, profile.ProfilePath(profDir))
+	return options, nil
+}
+
+var (
+	errEmptyProfDir = errors.New("empty profile directory")
+)
